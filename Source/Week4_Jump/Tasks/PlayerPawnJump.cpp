@@ -16,15 +16,18 @@ APlayerPawnJump::APlayerPawnJump()
 	RootComponent = CapsuleComponent;
 	// FOR SetSimulatePhysics I LOOKED INTO SOLUTIONS, BUT IT STILL DOESN'T WORK FOR ME
 	CapsuleComponent->SetSimulatePhysics(true);
+	CapsuleComponent->SetEnableGravity(true);
+	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CapsuleComponent->SetCollisionProfileName("Pawn");
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
-	MeshComponent->SetupAttachment(RootComponent);
+	MeshComponent->SetupAttachment(CapsuleComponent);
 
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	RootComponent = SpringArmComponent;
+	//SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	//SpringArmComponent->SetupAttachment(MeshComponent);
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComponent->SetupAttachment(SpringArmComponent);
+	CameraComponent->SetupAttachment(MeshComponent);
 }
 
 // Called when the game starts or when spawned
@@ -65,12 +68,12 @@ void APlayerPawnJump::MoveRight(float Value)
 
 void APlayerPawnJump::Jump()
 {
-	if (JumpCount < MaxJumpsCount)
+ 	if (JumpCount < MaxJumpsCount)
 	{
 		FVector JumpVector = FVector(0, 0, JumpForce);
 		CapsuleComponent->AddImpulse(JumpVector, "", true);
 
-		JumpCount++;
+		JumpCount = 1;
 	}
 }
 
@@ -83,6 +86,6 @@ void APlayerPawnJump::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 
 	if (HitDirection > 0)
 	{
-		JumpCount--;
+		JumpCount=0;
 	}
 }
